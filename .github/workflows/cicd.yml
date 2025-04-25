@@ -36,16 +36,6 @@ jobs:
     - name: Update kubeconfig
       run: aws eks update-kubeconfig --region $AWS_REGION --name $EKS_CLUSTER_NAME
 
-    - name: Build, tag, and push images
-      run: |
-        SERVICES=("agent-service" "aggregator-service" "integration-service" "notification-service" "redshift-publisher-service")
-        for service in "${SERVICES[@]}"; do
-          IMAGE_TAG=$ECR_REGISTRY/kce/$service:v0.0.1
-          echo "Building $service..."
-          docker build -t $IMAGE_TAG ./$service
-          docker push $IMAGE_TAG
-        done
-
     - name: Deploy to EKS
       run: |
         kubectl apply -f agent-service/deployment.yaml
