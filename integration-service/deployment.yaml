@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: integration-service
+  labels:
+    app: integration-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: integration-service
+  template:
+    metadata:
+      labels:
+        app: integration-service
+    spec:
+      containers:
+        - name: integration-service
+          image: 180294184800.dkr.ecr.ap-south-1.amazonaws.com/kce/integration-service:v0.0.1
+          ports:
+            - containerPort: 8082
+          env:
+            - name: DB_HOST
+              value: "your-db-host"  # Replace with actual DB hostname or service
+            - name: DB_NAME
+              value: "moon-agent"
+            - name: DB_USER
+              value: "admin"
+            - name: DB_PASS
+              value: "password"
+            - name: DB_PORT
+              value: "5432"

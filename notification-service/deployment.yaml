@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notification-service
+  labels:
+    app: notification-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: notification-service
+  template:
+    metadata:
+      labels:
+        app: notification-service
+    spec:
+      containers:
+        - name: notification-service
+          image: 180294184800.dkr.ecr.ap-south-1.amazonaws.com/kce/notification-service:v0.0.1
+          ports:
+            - containerPort: 8083
+          env:
+            - name: DB_HOST
+              value: "ls-1da58d02ca2520ec50e600aa762e63871c25220d.c5g2628m27rg.ap-south-1.rds.amazonaws.com"
+            - name: DB_NAME
+              value: "moon-agent"
+            - name: DB_USER
+              value: "moonagentuser"
+            - name: DB_PASS
+              value: "DWIJRwybuh038&$"

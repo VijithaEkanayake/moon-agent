@@ -1,0 +1,32 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: sync-redshift-cronjob
+spec:
+  schedule: "0 3 * * *"  # Run daily at 3 AM
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: sync-to-redshift
+              image: 180294184800.dkr.ecr.ap-south-1.amazonaws.com/kce/redshift-publisher-service:v0.0.1
+              command: ["python", "redshift_publisher_service.py"]
+              env:
+                - name: PG_HOST
+                  value: "ls-1da58d02ca2520ec50e600aa762e63871c25220d.c5g2628m27rg.ap-south-1.rds.amazonaws.com"
+                - name: PG_DB
+                  value: "moon-agent"
+                - name: PG_USER
+                  value: "moonagentuser"
+                - name: PG_PASSWORD
+                  value: "DWIJRwybuh038&$"
+                - name: REDSHIFT_HOST
+                  value: "kce-cluster.cd9fbf7fnazh.ap-south-1.redshift.amazonaws.com"
+                - name: REDSHIFT_DB
+                  value: "moon-agent"
+                - name: REDSHIFT_USER
+                  value: "awsuser"
+                - name: REDSHIFT_PASSWORD
+                  value: "DWIJRwybuh038&$"
+          restartPolicy: OnFailure

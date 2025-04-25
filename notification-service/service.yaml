@@ -6,7 +6,6 @@ spec:
   type: LoadBalancer
   selector:
     app: notification-service
-    version: blue  # change this to green during deployment switch
   ports:
     - protocol: TCP
       port: 80

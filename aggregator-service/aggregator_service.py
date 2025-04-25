@@ -1,18 +1,14 @@
-from flask import Flask, jsonify
 import psycopg2
 import json
-from apscheduler.schedulers.background import BackgroundScheduler
-from datetime import datetime, timedelta
-import atexit
-
-app = Flask(__name__)
+from datetime import datetime
+import os
 
 # PostgreSQL connection
 DB_CONFIG = {
-    "host": "ls-1da58d02ca2520ec50e600aa762e63871c25220d.c5g2628m27rg.ap-south-1.rds.amazonaws.com",
-    "dbname": "moon-agent",
-    "user": "moonagentuser",
-    "password": "DWIJRwybuh038&$",
+    "host": os.getenv("PG_HOST", "ls-1da58d02ca2520ec50e600aa762e63871c25220d.c5g2628m27rg.ap-south-1.rds.amazonaws.com"),
+    "dbname": os.getenv("PG_DB", "moon-agent"),
+    "user": os.getenv("PG_USER", "moonagentuser"),
+    "password": os.getenv("PG_PASSWORD", "DWIJRwybuh038&$"),
     "port": 5432
 }
 
@@ -98,84 +94,12 @@ def generate_daily_reports():
         """, (report_date, "daily", json.dumps(report_data)))
 
         conn.commit()
-        print("Daily reports generated successfully")
+        print("✅ Daily reports generated successfully.")
     except Exception as e:
-        print(f"Error generating reports: {str(e)}")
+        print(f"❌ Error generating reports: {str(e)}")
     finally:
         if conn:
             conn.close()
 
-# Scheduled tasks
-scheduler = BackgroundScheduler()
-scheduler.add_job(func=generate_daily_reports, trigger="interval", minutes=1)  # Run daily at 2AM
-scheduler.start()
-
-# Shut down scheduler when exiting
-atexit.register(lambda: scheduler.shutdown())
-
-# API Endpoints
-@app.route('/trigger-report', methods=['POST'])
-def trigger_report():
-    try:
-        generate_daily_reports()
-        return jsonify({"message": "Report generation triggered successfully"}), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-@app.route('/reports/daily', methods=['GET'])
-def get_daily_reports():
-    conn = None
-    try:
-        conn = get_db()
-        cur = conn.cursor()
-
-        cur.execute("""
-            SELECT report_date, data 
-            FROM performance_reports
-            WHERE report_type = 'daily'
-            ORDER BY report_date DESC
-            LIMIT 7
-        """)
-        reports = [{
-            "date": r[0].isoformat(),
-            "data": r[1]
-        } for r in cur.fetchall()]
-        return jsonify(reports)
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-    finally:
-        if conn:
-            conn.close()
-
-@app.route('/performance/agents', methods=['GET'])
-def get_agent_performance():
-    conn = None
-    try:
-        conn = get_db()
-        cur = conn.cursor()
-
-        cur.execute("""
-            SELECT a.id, a.name, ap.period_start, ap.period_end, 
-                   ap.total_sales, ap.target_achieved
-            FROM agent_performance ap
-            JOIN agents a ON ap.agent_id = a.id
-            ORDER BY ap.period_start DESC, ap.total_sales DESC
-            LIMIT 100
-        """)
-
-        performance = [{
-            "agent_id": r[0], "name": r[1],
-            "period": {"start": r[2].isoformat(), "end": r[3].isoformat()},
-            "total_sales": float(r[4]),
-            "target_achieved": r[5]
-        } for r in cur.fetchall()]
-
-        return jsonify(performance)
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-    finally:
-        if conn:
-            conn.close()
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8081)
+if __name__ == "__main__":
+    generate_daily_reports()

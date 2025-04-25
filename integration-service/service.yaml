@@ -6,7 +6,6 @@ spec:
   type: LoadBalancer
   selector:
     app: integration-service
-    version: blue  # change to green during green switch
   ports:
     - protocol: TCP
       port: 80

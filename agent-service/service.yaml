@@ -6,7 +6,6 @@ spec:
   type: LoadBalancer
   selector:
     app: agent-service
-    version: blue  # this will be patched to "green" during deployment
   ports:
     - protocol: TCP
       port: 80

@@ -10,9 +10,9 @@ spec:
         spec:
           containers:
             - name: daily-report
-              image: your-dockerhub-username/report-cronjob:latest
+              image: 180294184800.dkr.ecr.ap-south-1.amazonaws.com/kce/aggregator-service:v0.0.1
               env:
-                - name: PG_HOST
+                - name: DB_HOST
                   value: "ls-1da58d02ca2520ec50e600aa762e63871c25220d.c5g2628m27rg.ap-south-1.rds.amazonaws.com"
                 - name: PG_DB
                   value: "moon-agent"
