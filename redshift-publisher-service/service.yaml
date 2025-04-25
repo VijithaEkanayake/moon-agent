@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: redshift-publisher-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: redshift-publisher-service
+    version: blue  # this will be patched to "green" during deployment
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080

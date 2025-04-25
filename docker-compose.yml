@@ -1,0 +1,69 @@
+version: '3.3'
+
+services:
+  postgres:
+    image: postgres:13
+    container_name: postgres-db
+    environment:
+      POSTGRES_DB: moon-agent
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  agent-service:
+    build: ./agent-service
+    container_name: agent-service
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    environment:
+      DB_NAME: moon-agent
+      DB_HOST: postgres
+      DB_USER: admin
+      DB_PASS: password
+
+  aggregrator-service:
+    build: ./aggregator-service
+    container_name: aggregator-service
+    ports:
+      - "8081:8081"
+    depends_on:
+      - postgres
+    environment:
+      DB_NAME: moon-agent
+      DB_HOST: postgres
+      DB_USER: admin
+      DB_PASS: password
+
+  integration-service:
+    build: ./integration-service
+    container_name: integration-service
+    ports:
+      - "8082:8082"
+    depends_on:
+      - postgres
+    environment:
+      DB_NAME: moon-agent
+      DB_HOST: postgres
+      DB_USER: admin
+      DB_PASS: password
+
+  notification-service:
+    build: ./notification-service
+    container_name: notification-service
+    ports:
+      - "8083:8083"
+    depends_on:
+      - postgres
+    environment:
+      DB_NAME: moon-agent
+      DB_HOST: postgres
+      DB_USER: admin
+      DB_PASS: password
+
+volumes:
+  pgdata:

@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: notification-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: notification-service
+    version: blue  # change this to green during deployment switch
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8083
