@@ -1,23 +1,18 @@
-apiVersion: batch/v1
-kind: CronJob
-metadata:
-  name: daily-report-cronjob
-spec:
-  schedule: "0 2 * * *"  # Every day at 2 AM
-  jobTemplate:
-    spec:
-      template:
-        spec:
-          containers:
-            - name: daily-report
-              image: your-dockerhub-username/report-cronjob:latest
-              env:
-                - name: PG_HOST
-                  value: "ls-1da58d02ca2520ec50e600aa762e63871c25220d.c5g2628m27rg.ap-south-1.rds.amazonaws.com"
-                - name: PG_DB
-                  value: "moon-agent"
-                - name: PG_USER
-                  value: "moonagentuser"
-                - name: PG_PASSWORD
-                  value: "DWIJRwybuh038&$"
-          restartPolicy: OnFailure
+# Use the official Python image
+FROM python:3.9-slim
+
+# Set the working directory
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y libpq-dev gcc
+
+COPY requirements.txt requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+# Expose the port
+EXPOSE 8080
+
+# Run the service
+CMD ["python", "aggregator_service.py"]
